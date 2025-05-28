@@ -1,0 +1,58 @@
+# Node modules
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+
+# Logs
+**/logs
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# TypeScript
+**/*.tsbuildinfo
+
+# Env files
+**/.env
+**/.env.* 
+
+# Coverage
+**/coverage/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Optional npm cache directory
+.npm/
+
+# Yarn integrity file
+.yarn-integrity
+
+# Frontend specific
+**/.parcel-cache/
+**/.next/
+**/.storybook/
+
+# React specific
+**/public/static/
+
+# Others
+**/tmp/
+**/temp/
+
+# Optional: Ignore lockfiles if you are not committing them
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
