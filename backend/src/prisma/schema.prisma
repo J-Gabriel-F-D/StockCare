@@ -1,0 +1,20 @@
+model Insumo {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  validade    DateTime
+  quantidade  Int
+  fornecedor  Fornecedor @relation(fields: [fornecedorId], references: [id])
+  fornecedorId Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Fornecedor {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  contato   String?
+  contratos String?
+  prazoEntrega String?
+
+  insumos   Insumo[]
+}
