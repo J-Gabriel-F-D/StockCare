@@ -25,7 +25,7 @@ model Insumo {
   nome           String
   descricao      String?
   unidadeMedida  String
-  quantidade     Float
+  quantidade     Int
   precoUnitario  Float
   criadoEm       DateTime   @default(now())
 
