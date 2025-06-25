@@ -1,20 +1,34 @@
-model Insumo {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  validade    DateTime
-  quantidade  Int
-  fornecedor  Fornecedor @relation(fields: [fornecedorId], references: [id])
-  fornecedorId Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" 
+  url      = env("DATABASE_URL")
 }
 
 model Fornecedor {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   nome      String
-  contato   String?
-  contratos String?
-  prazoEntrega String?
+  cnpj      String    @unique
+  telefone  String?
+  email     String?
+  criadoEm  DateTime  @default(now())
 
   insumos   Insumo[]
+}
+
+model Insumo {
+  id             Int        @id @default(autoincrement())
+  nome           String
+  descricao      String?
+  unidadeMedida  String
+  quantidade     Float
+  precoUnitario  Float
+  criadoEm       DateTime   @default(now())
+
+  fornecedorId   Int
+  fornecedor     Fornecedor @relation(fields: [fornecedorId], references: [id])
 }
