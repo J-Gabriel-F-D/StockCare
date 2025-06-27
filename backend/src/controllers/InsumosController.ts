@@ -34,18 +34,19 @@ const createInsumo = async (req: Request, res: Response) => {
     const novoInsumo = {
       nome: req.body.nome,
       descricao: req.body.descricao,
-      unidadeMedida: req.body.unidadeMedida.toupperCase(),
+      unidadeMedida: req.body.unidadeMedida.toUpperCase(),
       quantidade: req.body.quantidade,
       precoUnitario: req.body.precoUnitario,
-      fornecedor: {
-        connect: { id: req.body.fornecedorId },
-      },
+      fornecedorId: req.body.fornecedorId, // relação direta
     };
+
     const insumoCriado = await prisma.insumo.create({
       data: novoInsumo,
     });
+
     res.status(201).json(insumoCriado);
   } catch (error) {
+    console.error(error);
     res.status(400).json({ message: "Erro ao criar insumo", error });
   }
 };
