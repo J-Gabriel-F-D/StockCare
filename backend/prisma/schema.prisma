@@ -2,6 +2,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -31,4 +32,16 @@ model Insumo {
 
   fornecedorId   Int
   fornecedor     Fornecedor @relation(fields: [fornecedorId], references: [id])
+
+  Movimentacao Movimentacao[]
+}
+
+model Movimentacao {
+  id            Int       @id @default(autoincrement())
+  tipo          String    // 'entrada' ou 'saida'
+  quantidade    Int
+  data          DateTime  @default(now())
+  destino       String?   // apenas para saídas
+  insumo        Insumo    @relation(fields: [insumoId], references: [id])
+  insumoId      Int
 }
