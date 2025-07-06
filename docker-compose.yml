@@ -16,9 +16,7 @@ services:
       context: ./backend
     ports:
       - "3000:3000"
-    volumes:
-      - ./backend:/app
-      # - /app/node_modules
+
     depends_on:
       - db
     environment:
