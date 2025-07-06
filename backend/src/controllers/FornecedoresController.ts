@@ -45,14 +45,7 @@ const atualizarFornecedor = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const novoFornecedor = req.body;
-    if (
-      !novoFornecedor.nome ||
-      !novoFornecedor.email ||
-      !novoFornecedor.telefone ||
-      !novoFornecedor.cnpj
-    ) {
-      return res.status(400).json({ mensagem: "Dados inválidos" });
-    }
+
     if (isNaN(Number(id))) {
       return res.status(400).json({ mensagem: "ID inválido" });
     }
