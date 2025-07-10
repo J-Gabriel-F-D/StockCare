@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../lib/prisma";
 import { Request, Response } from "express";
-
-const prisma = new PrismaClient();
 
 const getInsumos = async (req: Request, res: Response) => {
   try {

@@ -1,8 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-
-// Lista de fornecedores simulada
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma";
 
 // Listar todos os fornecedores
 const getFornecedores = async (req: Request, res: Response) => {
