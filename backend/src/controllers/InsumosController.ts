@@ -33,7 +33,6 @@ const createInsumo = async (req: Request, res: Response) => {
       nome: req.body.nome,
       descricao: req.body.descricao,
       unidadeMedida: req.body.unidadeMedida.toUpperCase(),
-      quantidade: req.body.quantidade,
       precoUnitario: req.body.precoUnitario,
       fornecedorId: req.body.fornecedorId, // relação direta
     };
@@ -69,7 +68,6 @@ const updateInsumo = async (req: Request, res: Response) => {
         nome: newInsumo.nome,
         descricao: newInsumo.descricao,
         unidadeMedida: newInsumo.unidadeMedida,
-        quantidade: newInsumo.quantidade,
         precoUnitario: newInsumo.precoUnitario,
         fornecedor: {
           connect: { id: newInsumo.fornecedorId },
