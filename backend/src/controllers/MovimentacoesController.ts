@@ -16,23 +16,26 @@ const createMovimentacao = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Insumo não encontrado." });
     }
 
-    if (tipo === "saida" && insumo.quantidade < quantidade) {
-      return res
-        .status(400)
-        .json({ error: "Estoque insuficinete para saída." });
+    if (tipo === "saida") {
+      const movimentacoes = await prisma.movimentacao.findMany({
+        where: { insumoId },
+      });
+
+      const totalEntradas = movimentacoes
+        .filter((m) => m.tipo === "entrada")
+        .reduce((acc, m) => acc + m.quantidade, 0);
+
+      const totalSaidas = movimentacoes
+        .filter((m) => m.tipo === "saida")
+        .reduce((acc, m) => acc + m.quantidade, 0);
+
+      if (quantidade > totalEntradas - totalSaidas) {
+        return res
+          .status(400)
+          .json({ error: "Quantidade insuficiente para saída." });
+      }
     }
 
-    await prisma.insumo.update({
-      where: {
-        id: insumoId,
-      },
-      data: {
-        quantidade:
-          tipo === "entrada"
-            ? insumo.quantidade + quantidade
-            : insumo.quantidade - quantidade,
-      },
-    });
     const movimentacao = await prisma.movimentacao.create({
       data: {
         tipo,
