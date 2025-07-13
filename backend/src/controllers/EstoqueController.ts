@@ -15,7 +15,7 @@ const getEstoque = async (req: Request, res: Response) => {
       ).reduce((acc, mov) => acc + mov.quantidade, 0);
       const saidas = insumo.Movimentacao.filter(
         (mov) => mov.tipo === "saida"
-      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+      ).reduce((acc, mov) => acc - mov.quantidade, 0);
 
       return {
         id: insumo.id,
