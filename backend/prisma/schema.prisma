@@ -26,7 +26,6 @@ model Insumo {
   nome           String
   descricao      String?
   unidadeMedida  String
-  // quantidade     Int
   precoUnitario  Float
   criadoEm       DateTime   @default(now())
 
@@ -42,6 +41,8 @@ model Movimentacao {
   quantidade    Int
   data          DateTime  @default(now())
   destino       String?   // apenas para saídas
+  validade      DateTime? // apenas para entradas
+
   insumo        Insumo    @relation(fields: [insumoId], references: [id])
   insumoId      Int
 }

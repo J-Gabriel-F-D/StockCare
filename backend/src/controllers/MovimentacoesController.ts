@@ -3,7 +3,7 @@ import { prisma } from "../lib/prisma";
 
 const createMovimentacao = async (req: Request, res: Response) => {
   try {
-    const { tipo, quantidade, destino, insumoId } = req.body;
+    const { tipo, quantidade, destino, validade, insumoId } = req.body;
     if (!["entrada", "saida"].includes(tipo)) {
       return res
         .status(400)
@@ -41,6 +41,7 @@ const createMovimentacao = async (req: Request, res: Response) => {
         tipo,
         quantidade,
         destino: tipo === "saida" ? destino : null,
+        validade: tipo === "entrada" ? validade : null,
         insumoId,
       },
     });
