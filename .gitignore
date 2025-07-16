@@ -1,6 +1,9 @@
 # Node modules
 **/node_modules/
 
+# Exports
+**/exports/
+
 # Build outputs
 **/dist/
 **/build/
