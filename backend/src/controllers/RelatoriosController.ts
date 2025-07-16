@@ -200,7 +200,151 @@ const createRelatorio = async (req: Request, res: Response) => {
   }
 };
 
+const getInsumosCriticos = async (req: Request, res: Response) => {
+  try {
+    const insumos = await prisma.insumo.findMany({
+      include: {
+        Movimentacao: true,
+        fornecedor: true,
+      },
+    });
+
+    const criticos = insumos
+      .map((insumo) => {
+        const entradas = insumo.Movimentacao.filter(
+          (mov) => mov.tipo === "entrada"
+        ).reduce((acc, mov) => acc + mov.quantidade, 0);
+
+        const saidas = insumo.Movimentacao.filter(
+          (mov) => mov.tipo === "saida"
+        ).reduce((acc, mov) => acc + mov.quantidade, 0);
+
+        const saldo = entradas - saidas;
+
+        if (saldo < insumo.quantidadeMinima) {
+          return {
+            id: insumo.id,
+            nome: insumo.nome,
+            unidadeMedida: insumo.unidadeMedida,
+            quantidadeAtual: saldo,
+            quantidadeMinima: insumo.quantidadeMinima,
+            fornecedor: insumo.fornecedor?.nome ?? "N/A",
+          };
+        }
+
+        return null;
+      })
+      .filter((item) => item !== null);
+
+    res.status(200).json(criticos);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erro ao buscar insumos críticos: " + error });
+  }
+};
+
+const exportInsumosCriticos = async (req: Request, res: Response) => {
+  try {
+    const formato = req.query.formato?.toString();
+
+    if (!formato || !["pdf", "xlsx"].includes(formato)) {
+      return res.status(400).json({
+        error: "Formato inválido ou ausente. Use ?formato=pdf ou ?formato=xlsx",
+      });
+    }
+
+    const insumos = await prisma.insumo.findMany({
+      include: { Movimentacao: true, fornecedor: true },
+    });
+
+    const criticos = insumos
+      .map((insumo) => {
+        const entradas = insumo.Movimentacao.filter(
+          (m) => m.tipo === "entrada"
+        ).reduce((acc, m) => acc + m.quantidade, 0);
+        const saidas = insumo.Movimentacao.filter(
+          (m) => m.tipo === "saida"
+        ).reduce((acc, m) => acc + m.quantidade, 0);
+        const saldo = entradas - saidas;
+
+        if (saldo < insumo.quantidadeMinima) {
+          return {
+            nome: insumo.nome,
+            unidade: insumo.unidadeMedida,
+            atual: saldo,
+            minimo: insumo.quantidadeMinima,
+            fornecedor: insumo.fornecedor?.nome ?? "N/A",
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    if (formato === "xlsx") {
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Insumos Críticos");
+
+      sheet.columns = [
+        { header: "Insumo", key: "nome" },
+        { header: "Unidade", key: "unidade" },
+        { header: "Qtd Atual", key: "atual" },
+        { header: "Qtd Mínima", key: "minimo" },
+        { header: "Fornecedor", key: "fornecedor" },
+      ];
+
+      sheet.addRows(criticos);
+
+      const filePath = path.join(
+        __dirname,
+        "../../exports/relatorio-insumos-criticos.xlsx"
+      );
+      await workbook.xlsx.writeFile(filePath);
+
+      return res.download(filePath);
+    }
+
+    if (formato === "pdf") {
+      const doc = new PDFDocument();
+      const filePath = path.join(
+        __dirname,
+        "../../exports/relatorio-insumos-criticos.pdf"
+      );
+      const writeStream = fs.createWriteStream(filePath);
+      doc.pipe(writeStream);
+
+      doc
+        .fontSize(16)
+        .text("Relatório de Insumos Críticos", { align: "center" });
+      doc.moveDown();
+
+      criticos.forEach((item) => {
+        if (item) {
+          doc
+            .fontSize(12)
+            .text(`Insumo: ${item.nome}`)
+            .text(`Unidade: ${item.unidade}`)
+            .text(`Qtd Atual: ${item.atual}`)
+            .text(`Qtd Mínima: ${item.minimo}`)
+            .text(`Fornecedor: ${item.fornecedor}`)
+            .moveDown();
+        }
+      });
+
+      doc.end();
+
+      writeStream.on("finish", () => res.download(filePath));
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Erro ao exportar insumos críticos: " + error });
+  }
+};
+
 export const RelatoriosController = {
   getRelatorioMovimentacoes,
   createRelatorio,
+  getInsumosCriticos,
+  exportInsumosCriticos,
 };

@@ -41,12 +41,14 @@ const createMovimentacao = async (req: Request, res: Response) => {
         tipo,
         quantidade,
         destino: tipo === "saida" ? destino : null,
-        validade: tipo === "entrada" ? validade : null,
+        validade: tipo === "entrada" ? new Date(validade) : null,
         insumoId,
       },
     });
     return res.status(201).json(movimentacao);
   } catch (error) {
+    console.log(error);
+
     return res.status(500).json({ error: "Erro ao registrar movimentação." });
   }
 };
