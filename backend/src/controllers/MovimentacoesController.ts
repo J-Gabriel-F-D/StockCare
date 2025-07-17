@@ -12,6 +12,8 @@ const createMovimentacao = async (req: Request, res: Response) => {
 
     const insumo = await prisma.insumo.findUnique({ where: { id: insumoId } });
 
+    console.log(insumo, "id: ", insumoId);
+
     if (!insumo) {
       return res.status(404).json({ error: "Insumo não encontrado." });
     }

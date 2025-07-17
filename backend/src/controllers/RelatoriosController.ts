@@ -267,7 +267,7 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
     }
 
     const insumos = await prisma.insumo.findMany({
-      where: insumoId ? { id: insumoId } : {},
+      where: insumoId ? { id: insumoId.toString() } : {},
       include: {
         Movimentacao: true,
         fornecedor: true,

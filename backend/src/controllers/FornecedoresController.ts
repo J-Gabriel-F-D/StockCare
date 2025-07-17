@@ -11,7 +11,7 @@ const getFornecedores = async (req: Request, res: Response) => {
 const getFornecedorByID = async (req: Request, res: Response) => {
   const { id } = req.params;
   const fornecedor = await prisma.fornecedor.findUnique({
-    where: { id: Number(id) },
+    where: { id: String(id) },
   });
   if (!fornecedor) {
     return res.status(404).json({ mensagem: "Fornecedor não encontrado" });
@@ -43,17 +43,17 @@ const atualizarFornecedor = async (req: Request, res: Response) => {
     const { id } = req.params;
     const novoFornecedor = req.body;
 
-    if (isNaN(Number(id))) {
+    if (!id || typeof id !== "string") {
       return res.status(400).json({ mensagem: "ID inválido" });
     }
     const fornecedor = await prisma.fornecedor.findMany({
-      where: { id: Number(id) },
+      where: { id: String(id) },
     });
-    if (!fornecedor.some((f) => f.id === Number(id))) {
+    if (!fornecedor.some((f) => f.id === String(id))) {
       return res.status(404).json({ mensagem: "Fornecedor não encontrado" });
     }
     const fornecedorAtualizado = await prisma.fornecedor.update({
-      where: { id: Number(id) },
+      where: { id: String(id) },
       data: novoFornecedor,
     });
     res.json(fornecedorAtualizado);
@@ -67,13 +67,13 @@ const removerFornecedor = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const fornecedor = await prisma.fornecedor.findMany({
-      where: { id: Number(id) },
+      where: { id: String(id) },
     });
-    if (!fornecedor.some((f) => f.id === Number(id))) {
+    if (!fornecedor.some((f) => f.id === String(id))) {
       return res.status(404).json({ mensagem: "Fornecedor não encontrado" });
     }
     await prisma.fornecedor.delete({
-      where: { id: Number(id) },
+      where: { id: String(id) },
     });
     res.status(204).send();
   } catch (error) {

@@ -15,7 +15,7 @@ const getInsumoById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const insumo = await prisma.insumo.findUnique({
-      where: { id: Number(id) },
+      where: { id: id },
     });
     if (!insumo) {
       return res.status(404).json({ message: "Insumo não encontrado" });
@@ -55,16 +55,15 @@ const updateInsumo = async (req: Request, res: Response) => {
     const { id } = req.params;
     const newInsumo = req.body;
 
-    if (isNaN(Number(id))) {
-      return res.status(400).json({ message: "ID inválido" });
-    }
     // Verifica se o insumo existe antes de atualizar
-    const insumos = await prisma.insumo.findMany();
-    if (!insumos.some((i) => i.id === Number(id))) {
+    const insumo = await prisma.insumo.findUnique({
+      where: { id: id },
+    });
+    if (!insumo) {
       return res.status(404).json({ message: "Insumo não encontrado" });
     }
     const insumoAtualizado = await prisma.insumo.update({
-      where: { id: Number(id) },
+      where: { id: id },
       data: {
         nome: newInsumo.nome,
         descricao: newInsumo.descricao,
@@ -86,12 +85,14 @@ const updateInsumo = async (req: Request, res: Response) => {
 const deleteInsumo = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const insumos = await prisma.insumo.findMany();
-    if (!insumos.some((i) => i.id === Number(id))) {
+    const insumo = await prisma.insumo.findUnique({
+      where: { id: id },
+    });
+    if (!insumo) {
       return res.status(404).json({ message: "Insumo não encontrado" });
     }
     await prisma.insumo.delete({
-      where: { id: Number(id) },
+      where: { id: id },
     });
     res.status(204).send();
   } catch (error) {
