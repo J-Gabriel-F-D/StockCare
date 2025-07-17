@@ -34,7 +34,8 @@ const createInsumo = async (req: Request, res: Response) => {
       descricao: req.body.descricao,
       unidadeMedida: req.body.unidadeMedida.toUpperCase(),
       precoUnitario: req.body.precoUnitario,
-      fornecedorId: req.body.fornecedorId, // relação direta
+      fornecedorId: req.body.fornecedorId,
+      quantidadeMinima: req.body.quantidadeMinima,
     };
 
     const insumoCriado = await prisma.insumo.create({
@@ -69,6 +70,7 @@ const updateInsumo = async (req: Request, res: Response) => {
         descricao: newInsumo.descricao,
         unidadeMedida: newInsumo.unidadeMedida,
         precoUnitario: newInsumo.precoUnitario,
+        quantidadeMinima: newInsumo.quantidadeMinima,
         fornecedor: {
           connect: { id: newInsumo.fornecedorId },
         },

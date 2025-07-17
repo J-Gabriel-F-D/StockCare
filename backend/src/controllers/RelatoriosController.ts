@@ -202,19 +202,29 @@ const createRelatorio = async (req: Request, res: Response) => {
 
 const getInsumosCriticos = async (req: Request, res: Response) => {
   try {
+    const { insumo } = req.query;
+
+    const filtros: any = {};
+
+    if (insumo) {
+      filtros.insumoId = parseInt(insumo as string);
+    }
+
+    // Busca todos os insumos com movimentações filtradas
     const insumos = await prisma.insumo.findMany({
+      where: insumo ? { id: filtros.insumoId } : {},
       include: {
         Movimentacao: true,
         fornecedor: true,
       },
     });
 
+    // Calcula os saldos
     const criticos = insumos
       .map((insumo) => {
         const entradas = insumo.Movimentacao.filter(
           (mov) => mov.tipo === "entrada"
         ).reduce((acc, mov) => acc + mov.quantidade, 0);
-
         const saidas = insumo.Movimentacao.filter(
           (mov) => mov.tipo === "saida"
         ).reduce((acc, mov) => acc + mov.quantidade, 0);
@@ -223,18 +233,17 @@ const getInsumosCriticos = async (req: Request, res: Response) => {
 
         if (saldo < insumo.quantidadeMinima) {
           return {
-            id: insumo.id,
             nome: insumo.nome,
-            unidadeMedida: insumo.unidadeMedida,
-            quantidadeAtual: saldo,
-            quantidadeMinima: insumo.quantidadeMinima,
+            unidade: insumo.unidadeMedida,
+            atual: saldo,
+            minimo: insumo.quantidadeMinima,
             fornecedor: insumo.fornecedor?.nome ?? "N/A",
           };
         }
 
         return null;
       })
-      .filter((item) => item !== null);
+      .filter(Boolean);
 
     res.status(200).json(criticos);
   } catch (error) {
@@ -247,6 +256,9 @@ const getInsumosCriticos = async (req: Request, res: Response) => {
 const exportInsumosCriticos = async (req: Request, res: Response) => {
   try {
     const formato = req.query.formato?.toString();
+    const insumoId = req.query.insumoId
+      ? parseInt(req.query.insumoId as string)
+      : undefined;
 
     if (!formato || !["pdf", "xlsx"].includes(formato)) {
       return res.status(400).json({
@@ -255,7 +267,11 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
     }
 
     const insumos = await prisma.insumo.findMany({
-      include: { Movimentacao: true, fornecedor: true },
+      where: insumoId ? { id: insumoId } : {},
+      include: {
+        Movimentacao: true,
+        fornecedor: true,
+      },
     });
 
     const criticos = insumos
