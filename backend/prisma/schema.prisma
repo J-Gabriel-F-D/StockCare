@@ -11,39 +11,39 @@ datasource db {
 }
 
 model Fornecedor {
-  id        Int       @id @default(autoincrement())
+  id        String     @id @default(uuid())
   nome      String
-  cnpj      String    @unique
+  cnpj      String     @unique
   telefone  String?
   email     String?
-  criadoEm  DateTime  @default(now())
+  criadoEm  DateTime   @default(now())
 
   insumos   Insumo[]
 }
 
 model Insumo {
-  id             Int        @id @default(autoincrement())
-  nome           String
-  descricao      String?
-  unidadeMedida  String
-  precoUnitario  Float
-  quantidadeMinima Int @default(0) 
-  criadoEm       DateTime   @default(now())
+  id              String       @id @default(uuid())
+  nome            String
+  descricao       String?
+  unidadeMedida   String
+  precoUnitario   Float
+  quantidadeMinima Int        @default(0)
+  criadoEm        DateTime    @default(now())
 
-  fornecedorId   Int
-  fornecedor     Fornecedor @relation(fields: [fornecedorId], references: [id])
+  fornecedorId    String
+  fornecedor      Fornecedor  @relation(fields: [fornecedorId], references: [id])
 
-  Movimentacao Movimentacao[]
+  Movimentacao    Movimentacao[]
 }
 
 model Movimentacao {
-  id            Int       @id @default(autoincrement())
-  tipo          String    // 'entrada' ou 'saida'
-  quantidade    Int
-  data          DateTime  @default(now())
-  destino       String?   // apenas para saídas
-  validade      DateTime? // apenas para entradas
+  id         String     @id @default(uuid())
+  tipo       String     // 'entrada' ou 'saida'
+  quantidade Int
+  data       DateTime   @default(now())
+  destino    String?    // apenas para saídas
+  validade   DateTime?  // apenas para entradas
 
-  insumo        Insumo    @relation(fields: [insumoId], references: [id])
-  insumoId      Int
+  insumoId   String
+  insumo     Insumo     @relation(fields: [insumoId], references: [id])
 }
