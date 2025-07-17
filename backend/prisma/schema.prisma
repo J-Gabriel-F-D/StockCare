@@ -1,0 +1,49 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql" 
+  url      = env("DATABASE_URL")
+}
+
+model Fornecedor {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  cnpj      String    @unique
+  telefone  String?
+  email     String?
+  criadoEm  DateTime  @default(now())
+
+  insumos   Insumo[]
+}
+
+model Insumo {
+  id             Int        @id @default(autoincrement())
+  nome           String
+  descricao      String?
+  unidadeMedida  String
+  precoUnitario  Float
+  quantidadeMinima Int @default(0) 
+  criadoEm       DateTime   @default(now())
+
+  fornecedorId   Int
+  fornecedor     Fornecedor @relation(fields: [fornecedorId], references: [id])
+
+  Movimentacao Movimentacao[]
+}
+
+model Movimentacao {
+  id            Int       @id @default(autoincrement())
+  tipo          String    // 'entrada' ou 'saida'
+  quantidade    Int
+  data          DateTime  @default(now())
+  destino       String?   // apenas para saídas
+  validade      DateTime? // apenas para entradas
+
+  insumo        Insumo    @relation(fields: [insumoId], references: [id])
+  insumoId      Int
+}

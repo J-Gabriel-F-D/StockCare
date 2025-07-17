@@ -1,11 +1,15 @@
 # Node modules
 **/node_modules/
 
+# Exports
+**/exports/
+
 # Build outputs
 **/dist/
 **/build/
 
 # Logs
+*.log
 **/logs
 **/*.log
 npm-debug.log*
