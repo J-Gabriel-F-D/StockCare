@@ -6,6 +6,7 @@ import estoqueRoutes from "./routes/EstoqueRoutes";
 import alertaRoutes from "./routes/AlertasRoutes";
 import relatoriosRoutes from "./routes/RelatoriosRoutes";
 import { UsuariosRoutes } from "./routes/UsuariosRoutes";
+import { AuthRoutes } from "./routes/AuthRotes";
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.use("/estoque", estoqueRoutes);
 app.use("/alertas", alertaRoutes);
 app.use("/relatorios", relatoriosRoutes);
 app.use("/usuarios", UsuariosRoutes);
+app.use("/login", AuthRoutes);
 
 export default app;
