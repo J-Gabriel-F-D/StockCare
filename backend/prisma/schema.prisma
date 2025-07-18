@@ -46,4 +46,18 @@ model Movimentacao {
 
   insumoId   String
   insumo     Insumo     @relation(fields: [insumoId], references: [id])
+
+  Usuario Usuario[]
+}
+
+model Usuario {
+  id         String   @id @default(uuid())
+  nome       String
+  cpf        String   @unique
+  email      String   @unique
+  senha      String
+  matricula  Int
+  criadoEm   DateTime @default(now())
+
+  movimentacoes Movimentacao[]
 }
