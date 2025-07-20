@@ -45,6 +45,7 @@ const createMovimentacao = async (req: Request, res: Response) => {
         destino: tipo === "saida" ? destino : null,
         validade: tipo === "entrada" ? new Date(validade) : null,
         insumoId,
+        usuarioId: req.usuario?.id!,
       },
     });
     return res.status(201).json(movimentacao);
@@ -58,7 +59,16 @@ const createMovimentacao = async (req: Request, res: Response) => {
 const getMovimentacoes = async (req: Request, res: Response) => {
   try {
     const movimentacoes = await prisma.movimentacao.findMany({
-      include: { insumo: true },
+      include: {
+        insumo: true,
+        usuario: {
+          select: {
+            nome: true,
+            email: true,
+            matricula: true,
+          },
+        },
+      },
       orderBy: { data: "desc" },
     });
 

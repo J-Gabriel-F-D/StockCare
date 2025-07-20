@@ -46,8 +46,9 @@ model Movimentacao {
 
   insumoId   String
   insumo     Insumo     @relation(fields: [insumoId], references: [id])
-
-  Usuario Usuario[]
+  
+  usuario    Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId  String 
 }
 
 model Usuario {
