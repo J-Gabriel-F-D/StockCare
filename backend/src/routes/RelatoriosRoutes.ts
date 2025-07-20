@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { RelatoriosController } from "../controllers/RelatoriosController";
+import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
+
+router.use(autenticar);
 
 router.get("/movimentacoes", (req, res) => {
   RelatoriosController.getRelatorioMovimentacoes(req, res);

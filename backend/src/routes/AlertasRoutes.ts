@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { AlertasController } from "../controllers/AlertasControllers";
+import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
+
+router.use(autenticar);
 
 // Rota para buscar insumos com validade próxima
 router.get("/validade/:dias", AlertasController.getAlertasValidade);

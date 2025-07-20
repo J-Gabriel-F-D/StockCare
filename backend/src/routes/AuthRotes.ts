@@ -7,4 +7,4 @@ router.post("/", (req, res) => {
   AuthController.login(req, res);
 });
 
-export { router as AuthRoutes };
+export default router;
