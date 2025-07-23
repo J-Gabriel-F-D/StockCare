@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { RequestWithUser } from "../@types/express";
 
-const createMovimentacao = async (req: Request, res: Response) => {
+const createMovimentacao = async (req: RequestWithUser, res: Response) => {
   try {
     const { tipo, quantidade, destino, validade, insumoId } = req.body;
     if (!["entrada", "saida"].includes(tipo)) {

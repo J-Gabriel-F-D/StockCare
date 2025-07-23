@@ -1,8 +1,16 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { RequestWithUser } from "../@types/express";
+
+interface JwtPayload {
+  id: string;
+  nome: string;
+  email: string;
+  matricula: number;
+}
 
 export function autenticar(
-  req: Request,
+  req: RequestWithUser,
   res: Response,
   next: NextFunction
 ): void {
@@ -19,12 +27,7 @@ export function autenticar(
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET || "defaultsecret"
-    ) as {
-      id: string;
-      nome: string;
-      email: string;
-      matricula: number;
-    };
+    ) as JwtPayload;
 
     req.usuario = {
       id: decoded.id,
