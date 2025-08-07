@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { InsumosController } from "../controllers/InsumosController";
+import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
+
+router.use(autenticar);
 
 // Lista todos os insumos
 router.get("/", (req, res) => {

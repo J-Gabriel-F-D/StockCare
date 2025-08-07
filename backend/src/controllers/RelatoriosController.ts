@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { startOfYear } from "date-fns";
 import ExcelJS from "exceljs";
@@ -152,7 +152,7 @@ const createRelatorio = async (req: Request, res: Response) => {
       ];
       sheet.addRows(dados);
 
-      const filePath = path.resolve(__dirname, "../../exports/relatorio.xlsx");
+      const filePath = path.join(exportDir, "relatorio.xlsx");
       await workbook.xlsx.writeFile(filePath);
       return res.download(filePath, "relatorio.xlsx");
     }
@@ -160,7 +160,7 @@ const createRelatorio = async (req: Request, res: Response) => {
     // Caso o formato seja PDF
     if (formatoArquivo === "pdf") {
       const doc = new PDFDocument({ margin: 30 });
-      const filePath = path.resolve(__dirname, "../../exports/relatorio.pdf");
+      const filePath = path.join(exportDir, "relatorio.pdf");
       const writeStream = fs.createWriteStream(filePath);
 
       doc.pipe(writeStream);
@@ -266,6 +266,11 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
       });
     }
 
+    const exportDir = path.join(__dirname, "../../exports");
+    if (!fs.existsSync(exportDir)) {
+      fs.mkdirSync(exportDir, { recursive: true });
+    }
+
     const insumos = await prisma.insumo.findMany({
       where: insumoId ? { id: insumoId.toString() } : {},
       include: {
@@ -311,10 +316,7 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
 
       sheet.addRows(criticos);
 
-      const filePath = path.join(
-        __dirname,
-        "../../exports/relatorio-insumos-criticos.xlsx"
-      );
+      const filePath = path.join(exportDir, "relatorio-insumos-criticos.xlsx");
       await workbook.xlsx.writeFile(filePath);
 
       return res.download(filePath);
@@ -322,10 +324,7 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
 
     if (formato === "pdf") {
       const doc = new PDFDocument();
-      const filePath = path.join(
-        __dirname,
-        "../../exports/relatorio-insumos-criticos.pdf"
-      );
+      const filePath = path.join(exportDir, "relatorio-insumos-criticos.pdf");
       const writeStream = fs.createWriteStream(filePath);
       doc.pipe(writeStream);
 
@@ -358,9 +357,135 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
   }
 };
 
+const getInventario = async (req: Request, res: Response) => {
+  try {
+    const insumos = await prisma.insumo.findMany({
+      include: {
+        Movimentacao: true,
+        fornecedor: true,
+      },
+    });
+
+    const inventario = insumos.map((insumo) => {
+      const entradas = insumo.Movimentacao.filter(
+        (mov) => mov.tipo === "entrada"
+      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+      const saidas = insumo.Movimentacao.filter(
+        (mov) => mov.tipo === "saida"
+      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+
+      return {
+        id: insumo.id,
+        nome: insumo.nome,
+        unidade: insumo.unidadeMedida,
+        quantidadeAtual: entradas - saidas,
+        fornecedor: insumo.fornecedor?.nome ?? "N/A",
+      };
+    });
+
+    res.status(200).json(inventario);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao buscar inventário: " + error });
+  }
+};
+
+const exportInventario = async (req: Request, res: Response) => {
+  try {
+    const formato = req.query.formato?.toString();
+    if (!formato || !["xlsx", "pdf"].includes(formato)) {
+      return res
+        .status(400)
+        .json({ error: "Formato inválido. Use 'xlsx' ou 'pdf'" });
+    }
+
+    const exportDir = path.join(__dirname, "../../exports");
+    if (!fs.existsSync(exportDir)) {
+      fs.mkdirSync(exportDir, { recursive: true });
+    }
+
+    const insumos = await prisma.insumo.findMany({
+      include: {
+        Movimentacao: true,
+        fornecedor: true,
+      },
+    });
+
+    const inventario = insumos.map((insumo) => {
+      const entradas = insumo.Movimentacao.filter(
+        (mov) => mov.tipo === "entrada"
+      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+
+      const saidas = insumo.Movimentacao.filter(
+        (mov) => mov.tipo === "saida"
+      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+
+      return {
+        nome: insumo.nome,
+        unidade: insumo.unidadeMedida,
+        quantidadeAtual: entradas - saidas,
+        fornecedor: insumo.fornecedor?.nome ?? "N/A",
+      };
+    });
+
+    const nomeArquivo = `relatorio_inventario.${formato}`;
+    const caminho = path.join(exportDir, nomeArquivo);
+
+    if (formato === "xlsx") {
+      const workbook = new ExcelJS.Workbook();
+      const sheet = workbook.addWorksheet("Inventário");
+
+      sheet.columns = [
+        { header: "Nome do Insumo", key: "nome", width: 30 },
+        { header: "Unidade", key: "unidade", width: 15 },
+        { header: "Quantidade Atual", key: "quantidadeAtual", width: 20 },
+        { header: "Fornecedor", key: "fornecedor", width: 30 },
+      ];
+
+      inventario.forEach((item) => {
+        sheet.addRow(item);
+      });
+
+      await workbook.xlsx.writeFile(caminho);
+    }
+
+    if (formato === "pdf") {
+      const doc = new PDFDocument({ margin: 30 });
+      const writeStream = fs.createWriteStream(caminho);
+      doc.pipe(writeStream);
+
+      doc.fontSize(16).text("Relatório de Inventário", { align: "center" });
+      doc.moveDown();
+
+      inventario.forEach((item) => {
+        doc.fontSize(12).text(`Insumo: ${item.nome}`);
+        doc.text(`Unidade: ${item.unidade}`);
+        doc.text(`Quantidade Atual: ${item.quantidadeAtual}`);
+        doc.text(`Fornecedor: ${item.fornecedor}`);
+        doc.moveDown();
+      });
+
+      doc.end();
+
+      // Espera o arquivo PDF terminar de ser escrito antes de enviar
+      writeStream.on("finish", () => {
+        res.download(caminho, nomeArquivo);
+      });
+
+      return;
+    }
+
+    // Para XLSX, envia diretamente
+    res.download(caminho, nomeArquivo);
+  } catch (error) {
+    res.status(500).json({ error: "Erro ao exportar relatório: " + error });
+  }
+};
+
 export const RelatoriosController = {
   getRelatorioMovimentacoes,
   createRelatorio,
   getInsumosCriticos,
   exportInsumosCriticos,
+  getInventario,
+  exportInventario,
 };

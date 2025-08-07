@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma";
+import { RequestWithUser } from "../@types/express";
 
-const createMovimentacao = async (req: Request, res: Response) => {
+const createMovimentacao = async (req: RequestWithUser, res: Response) => {
   try {
     const { tipo, quantidade, destino, validade, insumoId } = req.body;
     if (!["entrada", "saida"].includes(tipo)) {
@@ -45,6 +46,7 @@ const createMovimentacao = async (req: Request, res: Response) => {
         destino: tipo === "saida" ? destino : null,
         validade: tipo === "entrada" ? new Date(validade) : null,
         insumoId,
+        usuarioId: req.usuario?.id!,
       },
     });
     return res.status(201).json(movimentacao);
@@ -58,7 +60,16 @@ const createMovimentacao = async (req: Request, res: Response) => {
 const getMovimentacoes = async (req: Request, res: Response) => {
   try {
     const movimentacoes = await prisma.movimentacao.findMany({
-      include: { insumo: true },
+      include: {
+        insumo: true,
+        usuario: {
+          select: {
+            nome: true,
+            email: true,
+            matricula: true,
+          },
+        },
+      },
       orderBy: { data: "desc" },
     });
 

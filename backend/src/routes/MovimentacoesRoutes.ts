@@ -1,14 +1,17 @@
 import { Router } from "express";
 import { MovimentacoesController } from "../controllers/MovimentacoesController";
+import { autenticar } from "../middleware/AuthMiddleware";
 
-const movimentacaoRouter = Router();
+const router = Router();
 
-movimentacaoRouter.post("/", (req, res) => {
+router.use(autenticar);
+
+router.post("/", (req, res) => {
   MovimentacoesController.createMovimentacao(req, res);
 });
 
-movimentacaoRouter.get("/", (req, res) => {
+router.get("/", (req, res) => {
   MovimentacoesController.getMovimentacoes(req, res);
 });
 
-export default movimentacaoRouter;
+export default router;
