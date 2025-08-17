@@ -7,9 +7,8 @@ const getAlertasValidade = async (req: Request, res: Response) => {
     const dias = parseInt(req.params.dias) || 30;
     const hoje = new Date();
 
-    const movimentacoes = await prisma.movimentacao.findMany({
+    const entradas = await prisma.entrada.findMany({
       where: {
-        tipo: "entrada",
         validade: {
           not: null,
           gte: hoje,
@@ -27,17 +26,18 @@ const getAlertasValidade = async (req: Request, res: Response) => {
       },
     });
 
-    // calcula dias restantes e filtra no JS
-    const resultado = movimentacoes
-      .map((mov) => {
-        const diasRestantes = differenceInDays(new Date(mov.validade!), hoje);
+    const resultado = entradas
+      .map((entrada) => {
+        const diasRestantes = differenceInDays(
+          new Date(entrada.validade!),
+          hoje
+        );
         return {
-          id: mov.insumo.id,
-          insumo: mov.insumo.nome,
-          quantidade: mov.quantidade,
-          validade: mov.validade,
-          fornecedor: mov.insumo.fornecedor?.nome || "N/A",
-          tipo: mov.tipo,
+          id: entrada.insumo.id,
+          insumo: entrada.insumo.nome,
+          quantidade: entrada.quantidade,
+          validade: entrada.validade,
+          fornecedor: entrada.insumo.fornecedor?.nome || "N/A",
           diasRestantes,
         };
       })

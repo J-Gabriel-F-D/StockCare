@@ -10,62 +10,82 @@ const getRelatorioMovimentacoes = async (req: Request, res: Response) => {
   try {
     const { tipo, insumo, inicio, fim, destino } = req.query;
 
-    const filtros: any = {};
-
-    if (tipo && (tipo === "entrada" || tipo === "saida")) {
-      filtros.tipo = tipo;
-    }
-
-    if (insumo) {
-      filtros.insumoId = parseInt(insumo as string);
-    }
-
     const dataInicio = inicio
       ? new Date(inicio as string)
       : startOfYear(new Date());
     const dataFim = fim ? new Date(fim as string) : new Date();
 
+    // Filtros comuns
+    const filtrosComuns: any = {
+      data: {
+        gte: dataInicio,
+        lte: dataFim,
+      },
+    };
+
+    if (insumo) {
+      filtrosComuns.insumoId = insumo as string;
+    }
+
+    // Filtros específicos para saída
+    const filtrosSaida = { ...filtrosComuns };
     if (destino) {
-      filtros.destino = {
+      filtrosSaida["destino"] = {
         contains: destino as string,
         mode: "insensitive",
       };
     }
 
-    filtros.data = {
-      gte: dataInicio,
-      lte: dataFim,
-    };
+    let entradas: any[] = [];
+    let saidas: any[] = [];
 
-    console.log(tipo, insumo, inicio, fim, destino, "\n", filtros);
-
-    const movimentacoes = await prisma.movimentacao.findMany({
-      where: filtros,
-      include: {
-        insumo: {
-          include: {
-            fornecedor: true,
-          },
+    if (!tipo || tipo === "entrada") {
+      entradas = await prisma.entrada.findMany({
+        where: filtrosComuns,
+        include: {
+          insumo: { include: { fornecedor: true } },
         },
-      },
-      orderBy: {
-        data: "desc",
-      },
-    });
+        orderBy: { data: "desc" },
+      });
+    }
 
-    const resultado = movimentacoes.map((mov) => ({
-      id: mov.id,
-      tipo: mov.tipo,
-      data: mov.data,
-      quantidade: mov.quantidade,
-      destino: mov.destino || "N/A",
-      insumo: mov.insumo?.nome || "N/A",
-      unidadeMedida: mov.insumo?.unidadeMedida || "N/A",
-      fornecedor: mov.insumo?.fornecedor?.nome || "N/A",
-    }));
+    if (!tipo || tipo === "saida") {
+      saidas = await prisma.saida.findMany({
+        where: filtrosSaida,
+        include: {
+          insumo: { include: { fornecedor: true } },
+        },
+        orderBy: { data: "desc" },
+      });
+    }
+
+    // Normaliza os dados para formato único
+    const resultado = [
+      ...entradas.map((e) => ({
+        id: e.id,
+        tipo: "entrada",
+        data: e.data,
+        quantidade: e.quantidade,
+        destino: "N/A",
+        insumo: e.insumo?.nome || "N/A",
+        unidadeMedida: e.insumo?.unidadeMedida || "N/A",
+        fornecedor: e.insumo?.fornecedor?.nome || "N/A",
+      })),
+      ...saidas.map((s) => ({
+        id: s.id,
+        tipo: "saida",
+        data: s.data,
+        quantidade: s.quantidade,
+        destino: s.destino || "N/A",
+        insumo: s.insumo?.nome || "N/A",
+        unidadeMedida: s.insumo?.unidadeMedida || "N/A",
+        fornecedor: s.insumo?.fornecedor?.nome || "N/A",
+      })),
+    ].sort((a, b) => b.data.getTime() - a.data.getTime()); // Ordena por data desc
 
     res.status(200).json(resultado);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Erro ao gerar relatório: " + error });
   }
 };
@@ -75,20 +95,8 @@ const createRelatorio = async (req: Request, res: Response) => {
     const { tipo, insumo, inicio, fim, destino, formato } = req.query;
 
     const exportDir = path.resolve(__dirname, "../../exports");
-    console.log(exportDir);
-
     if (!fs.existsSync(exportDir)) {
       fs.mkdirSync(exportDir, { recursive: true });
-    }
-
-    const filtros: any = {};
-
-    if (tipo && (tipo === "entrada" || tipo === "saida")) {
-      filtros.tipo = tipo;
-    }
-
-    if (insumo) {
-      filtros.insumoId = parseInt(insumo as string);
     }
 
     const dataInicio = inicio
@@ -96,39 +104,67 @@ const createRelatorio = async (req: Request, res: Response) => {
       : startOfYear(new Date());
     const dataFim = fim ? new Date(fim as string) : new Date();
 
-    if (destino) {
-      filtros.destino = {
-        contains: destino as string,
-        mode: "insensitive",
-      };
-    }
-    filtros.data = { gte: dataInicio, lte: dataFim };
+    const filtrosComuns: any = {
+      insumoId: insumo ? String(insumo) : undefined,
+      data: { gte: dataInicio, lte: dataFim },
+    };
 
-    const movimentacoes = await prisma.movimentacao.findMany({
-      where: filtros,
-      include: {
-        insumo: {
-          include: {
-            fornecedor: true,
-          },
+    let entradas: any[] = [];
+    let saidas: any[] = [];
+
+    if (!tipo || tipo === "entrada") {
+      entradas = await prisma.entrada.findMany({
+        where: filtrosComuns,
+        include: {
+          insumo: { include: { fornecedor: true } },
+          usuario: { select: { nome: true, email: true, matricula: true } },
         },
-      },
-      orderBy: { data: "desc" },
-    });
+        orderBy: { data: "desc" },
+      });
+    }
 
-    const dados = movimentacoes.map((mov) => ({
-      id: mov.id,
-      tipo: mov.tipo,
-      data: mov.data.toISOString().split("T")[0],
-      quantidade: mov.quantidade,
-      destino: mov.destino || "N/A",
-      insumo: mov.insumo?.nome || "N/A",
-      unidade: mov.insumo?.unidadeMedida || "N/A",
-      fornecedor: mov.insumo?.fornecedor?.nome || "N/A",
-    }));
+    if (!tipo || tipo === "saida") {
+      const filtrosSaida = { ...filtrosComuns };
+      if (destino) {
+        filtrosSaida.destino = {
+          contains: destino as string,
+          mode: "insensitive",
+        };
+      }
+      saidas = await prisma.saida.findMany({
+        where: filtrosSaida,
+        include: {
+          insumo: { include: { fornecedor: true } },
+          usuario: { select: { nome: true, email: true, matricula: true } },
+        },
+        orderBy: { data: "desc" },
+      });
+    }
+
+    const dados = [
+      ...entradas.map((e) => ({
+        id: e.id,
+        tipo: "entrada",
+        data: e.data.toISOString().split("T")[0],
+        quantidade: e.quantidade,
+        destino: "N/A",
+        insumo: e.insumo?.nome || "N/A",
+        unidade: e.insumo?.unidadeMedida || "N/A",
+        fornecedor: e.insumo?.fornecedor?.nome || "N/A",
+      })),
+      ...saidas.map((s) => ({
+        id: s.id,
+        tipo: "saida",
+        data: s.data.toISOString().split("T")[0],
+        quantidade: s.quantidade,
+        destino: s.destino || "N/A",
+        insumo: s.insumo?.nome || "N/A",
+        unidade: s.insumo?.unidadeMedida || "N/A",
+        fornecedor: s.insumo?.fornecedor?.nome || "N/A",
+      })),
+    ].sort((a, b) => (a.data < b.data ? 1 : -1));
 
     const formatoArquivo = (formato as string)?.toLowerCase();
-
     if (!formatoArquivo || !["xlsx", "pdf"].includes(formatoArquivo)) {
       return res.status(400).json({
         error:
@@ -136,7 +172,6 @@ const createRelatorio = async (req: Request, res: Response) => {
       });
     }
 
-    // Caso o formato seja XLSX
     if (formatoArquivo === "xlsx") {
       const workbook = new ExcelJS.Workbook();
       const sheet = workbook.addWorksheet("Relatório de Movimentações");
@@ -157,14 +192,12 @@ const createRelatorio = async (req: Request, res: Response) => {
       return res.download(filePath, "relatorio.xlsx");
     }
 
-    // Caso o formato seja PDF
     if (formatoArquivo === "pdf") {
       const doc = new PDFDocument({ margin: 30 });
       const filePath = path.join(exportDir, "relatorio.pdf");
       const writeStream = fs.createWriteStream(filePath);
 
       doc.pipe(writeStream);
-
       doc.fontSize(18).text("Relatório de Movimentações", { align: "center" });
       doc.moveDown();
 
@@ -183,17 +216,11 @@ const createRelatorio = async (req: Request, res: Response) => {
       });
 
       doc.end();
-
       writeStream.on("finish", () => {
         res.download(filePath, "relatorio.pdf");
       });
-
       return;
     }
-
-    return res
-      .status(400)
-      .json({ error: "Formato inválido. Use ?formato=pdf ou ?formato=xlsx" });
   } catch (error) {
     console.error("Erro ao exportar relatório:", error);
     res.status(500).json({ error: "Erro ao exportar relatório: " + error });
@@ -204,32 +231,31 @@ const getInsumosCriticos = async (req: Request, res: Response) => {
   try {
     const { insumo } = req.query;
 
-    const filtros: any = {};
+    const whereInsumo = insumo ? { id: insumo as string } : {};
 
-    if (insumo) {
-      filtros.insumoId = parseInt(insumo as string);
-    }
-
-    // Busca todos os insumos com movimentações filtradas
+    // Busca insumos com entradas e saídas associadas
     const insumos = await prisma.insumo.findMany({
-      where: insumo ? { id: filtros.insumoId } : {},
+      where: whereInsumo,
       include: {
-        Movimentacao: true,
+        Entrada: true,
+        Saida: true,
         fornecedor: true,
       },
     });
 
-    // Calcula os saldos
+    // Calcula saldo e filtra insumos críticos
     const criticos = insumos
       .map((insumo) => {
-        const entradas = insumo.Movimentacao.filter(
-          (mov) => mov.tipo === "entrada"
-        ).reduce((acc, mov) => acc + mov.quantidade, 0);
-        const saidas = insumo.Movimentacao.filter(
-          (mov) => mov.tipo === "saida"
-        ).reduce((acc, mov) => acc + mov.quantidade, 0);
+        const totalEntradas = insumo.Entrada.reduce(
+          (acc, e) => acc + e.quantidade,
+          0
+        );
+        const totalSaidas = insumo.Saida.reduce(
+          (acc, s) => acc + s.quantidade,
+          0
+        );
 
-        const saldo = entradas - saidas;
+        const saldo = totalEntradas - totalSaidas;
 
         if (saldo < insumo.quantidadeMinima) {
           return {
@@ -243,10 +269,11 @@ const getInsumosCriticos = async (req: Request, res: Response) => {
 
         return null;
       })
-      .filter(Boolean);
+      .filter((item) => item !== null);
 
     res.status(200).json(criticos);
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ error: "Erro ao buscar insumos críticos: " + error });
@@ -257,7 +284,7 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
   try {
     const formato = req.query.formato?.toString();
     const insumoId = req.query.insumoId
-      ? parseInt(req.query.insumoId as string)
+      ? (req.query.insumoId as string)
       : undefined;
 
     if (!formato || !["pdf", "xlsx"].includes(formato)) {
@@ -271,23 +298,27 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
       fs.mkdirSync(exportDir, { recursive: true });
     }
 
+    // Agora busca entradas e saídas separadas
     const insumos = await prisma.insumo.findMany({
-      where: insumoId ? { id: insumoId.toString() } : {},
+      where: insumoId ? { id: insumoId } : {},
       include: {
-        Movimentacao: true,
+        Entrada: true,
+        Saida: true,
         fornecedor: true,
       },
     });
 
     const criticos = insumos
       .map((insumo) => {
-        const entradas = insumo.Movimentacao.filter(
-          (m) => m.tipo === "entrada"
-        ).reduce((acc, m) => acc + m.quantidade, 0);
-        const saidas = insumo.Movimentacao.filter(
-          (m) => m.tipo === "saida"
-        ).reduce((acc, m) => acc + m.quantidade, 0);
-        const saldo = entradas - saidas;
+        const entradasTotal = insumo.Entrada.reduce(
+          (acc, e) => acc + e.quantidade,
+          0
+        );
+        const saidasTotal = insumo.Saida.reduce(
+          (acc, s) => acc + s.quantidade,
+          0
+        );
+        const saldo = entradasTotal - saidasTotal;
 
         if (saldo < insumo.quantidadeMinima) {
           return {
@@ -300,7 +331,7 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
         }
         return null;
       })
-      .filter(Boolean);
+      .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
     if (formato === "xlsx") {
       const workbook = new ExcelJS.Workbook();
@@ -334,16 +365,14 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
       doc.moveDown();
 
       criticos.forEach((item) => {
-        if (item) {
-          doc
-            .fontSize(12)
-            .text(`Insumo: ${item.nome}`)
-            .text(`Unidade: ${item.unidade}`)
-            .text(`Qtd Atual: ${item.atual}`)
-            .text(`Qtd Mínima: ${item.minimo}`)
-            .text(`Fornecedor: ${item.fornecedor}`)
-            .moveDown();
-        }
+        doc
+          .fontSize(12)
+          .text(`Insumo: ${item.nome}`)
+          .text(`Unidade: ${item.unidade}`)
+          .text(`Qtd Atual: ${item.atual}`)
+          .text(`Qtd Mínima: ${item.minimo}`)
+          .text(`Fornecedor: ${item.fornecedor}`)
+          .moveDown();
       });
 
       doc.end();
@@ -351,6 +380,7 @@ const exportInsumosCriticos = async (req: Request, res: Response) => {
       writeStream.on("finish", () => res.download(filePath));
     }
   } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ error: "Erro ao exportar insumos críticos: " + error });
@@ -361,30 +391,35 @@ const getInventario = async (req: Request, res: Response) => {
   try {
     const insumos = await prisma.insumo.findMany({
       include: {
-        Movimentacao: true,
+        Entrada: true,
+        Saida: true,
         fornecedor: true,
       },
     });
 
     const inventario = insumos.map((insumo) => {
-      const entradas = insumo.Movimentacao.filter(
-        (mov) => mov.tipo === "entrada"
-      ).reduce((acc, mov) => acc + mov.quantidade, 0);
-      const saidas = insumo.Movimentacao.filter(
-        (mov) => mov.tipo === "saida"
-      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+      const totalEntradas = insumo.Entrada.reduce(
+        (acc, entrada) => acc + entrada.quantidade,
+        0
+      );
+
+      const totalSaidas = insumo.Saida.reduce(
+        (acc, saida) => acc + saida.quantidade,
+        0
+      );
 
       return {
         id: insumo.id,
         nome: insumo.nome,
         unidade: insumo.unidadeMedida,
-        quantidadeAtual: entradas - saidas,
+        quantidadeAtual: totalEntradas - totalSaidas,
         fornecedor: insumo.fornecedor?.nome ?? "N/A",
       };
     });
 
     res.status(200).json(inventario);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Erro ao buscar inventário: " + error });
   }
 };
@@ -395,34 +430,40 @@ const exportInventario = async (req: Request, res: Response) => {
     if (!formato || !["xlsx", "pdf"].includes(formato)) {
       return res
         .status(400)
-        .json({ error: "Formato inválido. Use 'xlsx' ou 'pdf'" });
+        .json({ error: "Formato inválido. Use 'xlsx' ou 'pdf'." });
     }
 
+    // Cria diretório de exportação caso não exista
     const exportDir = path.join(__dirname, "../../exports");
     if (!fs.existsSync(exportDir)) {
       fs.mkdirSync(exportDir, { recursive: true });
     }
 
+    // Busca os insumos incluindo entradas, saidas e fornecedor
     const insumos = await prisma.insumo.findMany({
       include: {
-        Movimentacao: true,
+        Entrada: true,
+        Saida: true,
         fornecedor: true,
       },
     });
 
+    // Calcula o inventário atual
     const inventario = insumos.map((insumo) => {
-      const entradas = insumo.Movimentacao.filter(
-        (mov) => mov.tipo === "entrada"
-      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+      const totalEntradas = insumo.Entrada.reduce(
+        (acc, entrada) => acc + entrada.quantidade,
+        0
+      );
 
-      const saidas = insumo.Movimentacao.filter(
-        (mov) => mov.tipo === "saida"
-      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+      const totalSaidas = insumo.Saida.reduce(
+        (acc, saida) => acc + saida.quantidade,
+        0
+      );
 
       return {
         nome: insumo.nome,
         unidade: insumo.unidadeMedida,
-        quantidadeAtual: entradas - saidas,
+        quantidadeAtual: totalEntradas - totalSaidas,
         fornecedor: insumo.fornecedor?.nome ?? "N/A",
       };
     });
@@ -446,6 +487,8 @@ const exportInventario = async (req: Request, res: Response) => {
       });
 
       await workbook.xlsx.writeFile(caminho);
+      // Envia arquivo após salvar
+      return res.download(caminho, nomeArquivo);
     }
 
     if (formato === "pdf") {
@@ -466,18 +509,23 @@ const exportInventario = async (req: Request, res: Response) => {
 
       doc.end();
 
-      // Espera o arquivo PDF terminar de ser escrito antes de enviar
+      // Aguarda o término da escrita para enviar
       writeStream.on("finish", () => {
-        res.download(caminho, nomeArquivo);
+        return res.download(caminho, nomeArquivo);
+      });
+
+      writeStream.on("error", (err) => {
+        console.error("Erro ao escrever PDF:", err);
+        return res.status(500).json({ error: "Erro ao gerar PDF." });
       });
 
       return;
     }
-
-    // Para XLSX, envia diretamente
-    res.download(caminho, nomeArquivo);
   } catch (error) {
-    res.status(500).json({ error: "Erro ao exportar relatório: " + error });
+    console.error("Erro exportInventario:", error);
+    return res
+      .status(500)
+      .json({ error: "Erro ao exportar relatório: " + error });
   }
 };
 

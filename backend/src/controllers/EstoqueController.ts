@@ -5,23 +5,27 @@ const getEstoque = async (req: Request, res: Response) => {
   try {
     const insumos = await prisma.insumo.findMany({
       include: {
-        Movimentacao: true,
+        Entrada: true,
+        Saida: true,
         fornecedor: true,
       },
     });
+
     const estoque = insumos.map((insumo) => {
-      const entradas = insumo.Movimentacao.filter(
-        (mov) => mov.tipo === "entrada"
-      ).reduce((acc, mov) => acc + mov.quantidade, 0);
-      const saidas = insumo.Movimentacao.filter(
-        (mov) => mov.tipo === "saida"
-      ).reduce((acc, mov) => acc + mov.quantidade, 0);
+      const totalEntradas = (insumo.Entrada ?? []).reduce(
+        (acc, entrada) => acc + entrada.quantidade,
+        0
+      );
+      const totalSaidas = (insumo.Saida ?? []).reduce(
+        (acc, saida) => acc + saida.quantidade,
+        0
+      );
 
       return {
         id: insumo.id,
         nome: insumo.nome,
         unidadeMedida: insumo.unidadeMedida,
-        quantidadeAtual: entradas - saidas,
+        quantidadeAtual: totalEntradas - totalSaidas,
         fornecedor: insumo.fornecedor?.nome ?? "N/A",
       };
     });

@@ -33,22 +33,8 @@ model Insumo {
   fornecedorId    String
   fornecedor      Fornecedor  @relation(fields: [fornecedorId], references: [id])
 
-  Movimentacao    Movimentacao[]
-}
-
-model Movimentacao {
-  id         String     @id @default(uuid())
-  tipo       String     // 'entrada' ou 'saida'
-  quantidade Int
-  data       DateTime   @default(now())
-  destino    String?    // apenas para saídas
-  validade   DateTime?  // apenas para entradas
-
-  insumoId   String
-  insumo     Insumo     @relation(fields: [insumoId], references: [id])
-  
-  usuario    Usuario   @relation(fields: [usuarioId], references: [id])
-  usuarioId  String 
+  Entrada Entrada[]
+  Saida Saida[]
 }
 
 model Usuario {
@@ -60,5 +46,32 @@ model Usuario {
   matricula  Int
   criadoEm   DateTime @default(now())
 
-  movimentacoes Movimentacao[]
+  Entrada Entrada[]
+  Saida Saida[]
+}
+
+model Entrada {
+  id         String   @id @default(uuid())
+  quantidade Int
+  data       DateTime @default(now())
+  validade   DateTime?
+
+  insumoId   String
+  insumo     Insumo   @relation(fields: [insumoId], references: [id])
+
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model Saida {
+  id         String   @id @default(uuid())
+  quantidade Int
+  data       DateTime @default(now())
+  destino    String
+
+  insumoId   String
+  insumo     Insumo   @relation(fields: [insumoId], references: [id])
+
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
 }
