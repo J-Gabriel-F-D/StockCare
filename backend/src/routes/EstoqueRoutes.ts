@@ -6,7 +6,7 @@ const router = Router();
 
 router.use(autenticar);
 
-router.get("/", (req, res) => {
+router.get("/estoque", (req, res) => {
   EstoqueController.getEstoque(req, res);
 });
 

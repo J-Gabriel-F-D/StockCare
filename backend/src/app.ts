@@ -14,18 +14,18 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/insumos", insumosRoutes);
-app.use("/fornecedores", fornecedoresRoutes);
+app.use("/api", insumosRoutes);
+app.use("/api", fornecedoresRoutes);
 
-app.use("/entrada", entradasRouter);
-app.use("/saida", saidaRouter);
+app.use("/api", entradasRouter);
+app.use("/api", saidaRouter);
 
-app.use("/compras", comprasRoutes);
+app.use("/api", comprasRoutes);
 
-app.use("/estoque", estoqueRoutes);
-app.use("/alertas", alertaRoutes);
-app.use("/relatorios", relatoriosRoutes);
-app.use("/usuarios", usuariosRoutes);
-app.use("/login", authRouter);
+app.use("/api", estoqueRoutes);
+app.use("/api", alertaRoutes);
+app.use("/api", relatoriosRoutes);
+app.use("/api", usuariosRoutes);
+app.use("/api", authRouter);
 
 export default app;

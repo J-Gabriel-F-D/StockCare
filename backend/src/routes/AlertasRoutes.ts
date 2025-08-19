@@ -7,6 +7,6 @@ const router = Router();
 router.use(autenticar);
 
 // Rota para buscar insumos com validade próxima
-router.get("/validade/:dias", AlertasController.getAlertasValidade);
+router.get("/alertas/validade/:dias", AlertasController.getAlertasValidade);
 
 export default router;

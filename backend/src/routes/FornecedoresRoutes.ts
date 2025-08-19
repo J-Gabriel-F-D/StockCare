@@ -7,27 +7,27 @@ const router = Router();
 router.use(autenticar);
 
 // Lista todos os fornecedores
-router.get("/", (req, res) => {
+router.get("/fornecedores", (req, res) => {
   FornecedoresController.getFornecedores(req, res);
 });
 
 // Busca fornecedor por ID
-router.get("/:id", (req, res) => {
+router.get("/fornecedores/:id", (req, res) => {
   FornecedoresController.getFornecedorByID(req, res);
 });
 
 // Cria um novo fornecedor
-router.post("/", (req, res) => {
+router.post("/fornecedores", (req, res) => {
   FornecedoresController.criarFornecedor(req, res);
 });
 
 // Atualiza um fornecedor existente
-router.put("/:id", (req, res) => {
+router.put("/fornecedores/:id", (req, res) => {
   FornecedoresController.atualizarFornecedor(req, res);
 });
 
 // Deleta um fornecedor
-router.delete("/:id", (req, res) => {
+router.delete("/fornecedores/:id", (req, res) => {
   FornecedoresController.removerFornecedor(req, res);
 });
 

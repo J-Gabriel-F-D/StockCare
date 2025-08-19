@@ -8,9 +8,9 @@ const router = Router();
 router.use(autenticar);
 
 // Rota para solicitar compra de insumos
-router.post("/", ComprasController.solicitarCompra);
+router.post("/compras", ComprasController.solicitarCompra);
 
 // Rota para listar pedidos de compra já realizados
-router.get("/", ComprasController.listarPedidos);
+router.get("/compras", ComprasController.listarPedidos);
 
 export default router;

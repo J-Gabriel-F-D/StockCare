@@ -6,11 +6,11 @@ const router = Router();
 
 router.use(autenticar);
 
-router.post("/", (req, res) => {
+router.post("/saida", (req, res) => {
   SaidasController.createSaida(req, res);
 });
 
-router.get("/", (req, res) => {
+router.get("/saida", (req, res) => {
   SaidasController.getSaidas(req, res);
 });
 

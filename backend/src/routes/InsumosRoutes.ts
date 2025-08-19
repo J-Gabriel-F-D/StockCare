@@ -7,27 +7,27 @@ const router = Router();
 router.use(autenticar);
 
 // Lista todos os insumos
-router.get("/", (req, res) => {
+router.get("/insumos", (req, res) => {
   InsumosController.getInsumos(req, res);
 });
 
 // Cria um novo insumo
-router.post("/", (req, res) => {
+router.post("/insumos", (req, res) => {
   InsumosController.createInsumo(req, res);
 });
 
 // Busca um insumo por ID
-router.get("/:id", (req, res) => {
+router.get("/insumos/:id", (req, res) => {
   InsumosController.getInsumoById(req, res);
 });
 
 // Atualiza um insumo existente
-router.put("/:id", (req, res) => {
+router.put("/insumos/:id", (req, res) => {
   InsumosController.updateInsumo(req, res);
 });
 
 // Deleta um insumo
-router.delete("/:id", (req, res) => {
+router.delete("/insumos/:id", (req, res) => {
   InsumosController.deleteInsumo(req, res);
 });
 

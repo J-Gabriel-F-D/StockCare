@@ -6,11 +6,11 @@ const router = Router();
 
 router.use(autenticar);
 
-router.post("/", (req, res) => {
+router.post("/entrada", (req, res) => {
   EntradasController.createEntrada(req, res);
 });
 
-router.get("/", (req, res) => {
+router.get("/entrada", (req, res) => {
   EntradasController.getEntradas(req, res);
 });
 
