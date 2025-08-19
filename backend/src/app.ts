@@ -8,6 +8,7 @@ import relatoriosRoutes from "./routes/RelatoriosRoutes";
 import usuariosRoutes from "./routes/UsuariosRoutes";
 import authRouter from "./routes/AuthRotes";
 import saidaRouter from "./routes/SaidasRoutes";
+import comprasRoutes from "./routes/ComprasRoutes";
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use("/fornecedores", fornecedoresRoutes);
 
 app.use("/entrada", entradasRouter);
 app.use("/saida", saidaRouter);
+
+app.use("/compras", comprasRoutes);
 
 app.use("/estoque", estoqueRoutes);
 app.use("/alertas", alertaRoutes);
