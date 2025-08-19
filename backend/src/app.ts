@@ -1,4 +1,6 @@
 import express from "express";
+import { setupSwagger } from "./lib/swagger";
+
 import insumosRoutes from "./routes/InsumosRoutes";
 import fornecedoresRoutes from "./routes/FornecedoresRoutes";
 import entradasRouter from "./routes/EntradasRoutes";
@@ -12,6 +14,7 @@ import comprasRoutes from "./routes/ComprasRoutes";
 
 const app = express();
 
+setupSwagger(app);
 app.use(express.json());
 
 app.use("/api", insumosRoutes);
