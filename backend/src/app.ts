@@ -11,9 +11,11 @@ import usuariosRoutes from "./routes/UsuariosRoutes";
 import authRouter from "./routes/AuthRotes";
 import saidaRouter from "./routes/SaidasRoutes";
 import comprasRoutes from "./routes/ComprasRoutes";
+import { setupSecurity } from "./middleware/security";
 
 const app = express();
 
+setupSecurity(app);
 setupSwagger(app);
 app.use(express.json());
 
