@@ -35,6 +35,8 @@ model Insumo {
 
   Entrada Entrada[]
   Saida Saida[]
+
+  PedidoCompra PedidoCompra[]
 }
 
 model Usuario {
@@ -74,4 +76,15 @@ model Saida {
 
   usuarioId  String
   usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model PedidoCompra {
+  id        String   @id @default(uuid())
+  insumoId  String
+  quantidade Int
+  status    String   @default("PENDENTE") // PENDENTE | ENVIADO | RECEBIDO
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  insumo    Insumo   @relation(fields: [insumoId], references: [id])
 }
