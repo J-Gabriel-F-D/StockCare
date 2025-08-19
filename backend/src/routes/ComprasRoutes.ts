@@ -1,25 +1,26 @@
 import { Router } from "express";
-import { SaidasController } from "../controllers/SaidasController";
+import { ComprasController } from "../controllers/ComprasController";
 import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
+// Todas as rotas de compras exigem autenticação
 router.use(autenticar);
 
 /**
  * @swagger
  * tags:
- *   name: Saidas
- *   description: Gerenciamento de saídas do estoque
+ *   name: Compras
+ *   description: Gerenciamento de solicitações de compra de insumos
  */
 
 /**
  * @swagger
- * /saida:
+ * /compras:
  *   post:
- *     summary: Registra uma nova saída do estoque
- *     description: Cria um registro de saída de insumos do estoque (baixa de estoque)
- *     tags: [Saidas]
+ *     summary: Solicita compra de insumos
+ *     description: Cria uma nova solicitação de compra de insumos para o setor de compras
+ *     tags: [Compras]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -27,16 +28,16 @@ router.use(autenticar);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/SaidaInput'
+ *             $ref: '#/components/schemas/SolicitacaoCompraInput'
  *     responses:
  *       201:
- *         description: Saída registrada com sucesso
+ *         description: Solicitação de compra criada com sucesso
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Saida'
+ *               $ref: '#/components/schemas/PedidoCompra'
  *       400:
- *         description: Dados de entrada inválidos ou estoque insuficiente
+ *         description: Dados de entrada inválidos ou insumo não encontrado
  *         content:
  *           application/json:
  *             schema:
@@ -44,7 +45,7 @@ router.use(autenticar);
  *               properties:
  *                 error:
  *                   type: string
- *                   example: "Estoque insuficiente para o insumo"
+ *                   example: "Quantidade deve ser maior que zero"
  *       401:
  *         description: Não autorizado - token inválido ou ausente
  *       404:
@@ -52,17 +53,15 @@ router.use(autenticar);
  *       500:
  *         description: Erro interno do servidor
  */
-router.post("/saida", (req, res) => {
-  SaidasController.createSaida(req, res);
-});
+router.post("/compras", ComprasController.solicitarCompra);
 
 /**
  * @swagger
- * /saida:
+ * /compras:
  *   get:
- *     summary: Lista todas as saídas do estoque
- *     description: Retorna uma lista de todos os registros de saída do estoque
- *     tags: [Saidas]
+ *     summary: Lista pedidos de compra
+ *     description: Retorna uma lista de todos os pedidos de compra solicitados
+ *     tags: [Compras]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -82,6 +81,12 @@ router.post("/saida", (req, res) => {
  *           default: 10
  *         description: Número de itens por página
  *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [PENDENTE, ENVIADO, RECEBIDO, CANCELADO]
+ *         description: Filtrar por status do pedido
+ *       - in: query
  *         name: insumoId
  *         schema:
  *           type: string
@@ -92,30 +97,31 @@ router.post("/saida", (req, res) => {
  *         schema:
  *           type: string
  *           format: date
- *         description: Data inicial para filtrar saídas (YYYY-MM-DD)
+ *         description: Data inicial para filtrar pedidos (YYYY-MM-DD)
  *       - in: query
  *         name: dataFim
  *         schema:
  *           type: string
  *           format: date
- *         description: Data final para filtrar saídas (YYYY-MM-DD)
+ *         description: Data final para filtrar pedidos (YYYY-MM-DD)
  *       - in: query
- *         name: destino
+ *         name: usuarioId
  *         schema:
  *           type: string
- *         description: Filtrar por destino/setor da saída
+ *           format: uuid
+ *         description: Filtrar por ID do usuário que solicitou
  *     responses:
  *       200:
- *         description: Lista de saídas obtida com sucesso
+ *         description: Lista de pedidos de compra obtida com sucesso
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 saidas:
+ *                 pedidos:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Saida'
+ *                     $ref: '#/components/schemas/PedidoCompra'
  *                 paginacao:
  *                   type: object
  *                   properties:
@@ -134,16 +140,14 @@ router.post("/saida", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/saida", (req, res) => {
-  SaidasController.getSaidas(req, res);
-});
+router.get("/compras", ComprasController.listarPedidos);
 
 // Definição dos schemas
 /**
  * @swagger
  * components:
  *   schemas:
- *     Saida:
+ *     PedidoCompra:
  *       type: object
  *       properties:
  *         id:
@@ -157,27 +161,37 @@ router.get("/saida", (req, res) => {
  *         quantidade:
  *           type: integer
  *           minimum: 1
- *           example: 5
- *         dataSaida:
+ *           example: 100
+ *         status:
  *           type: string
- *           format: date-time
- *           example: "2024-01-15T14:30:00.000Z"
- *         destino:
+ *           enum: [PENDENTE, ENVIADO, RECEBIDO, CANCELADO]
+ *           example: "PENDENTE"
+ *         prioridade:
  *           type: string
- *           example: "Setor de Enfermagem"
- *         motivo:
+ *           enum: [BAIXA, MEDIA, ALTA, URGENTE]
+ *           example: "MEDIA"
+ *         justificativa:
  *           type: string
- *           example: "Atendimento de emergência"
- *         paciente:
- *           type: string
- *           example: "João da Silva"
+ *           example: "Estoque abaixo do nível mínimo"
  *         usuarioId:
  *           type: string
  *           format: uuid
  *           example: "550e8400-e29b-41d4-a716-446655440003"
+ *         dataSolicitacao:
+ *           type: string
+ *           format: date-time
+ *           example: "2024-01-15T10:30:00.000Z"
+ *         dataEnvio:
+ *           type: string
+ *           format: date-time
+ *           example: "2024-01-16T09:15:00.000Z"
+ *         dataRecebimento:
+ *           type: string
+ *           format: date-time
+ *           example: "2024-01-18T14:20:00.000Z"
  *         observacoes:
  *           type: string
- *           example: "Saída realizada para procedimento de urgência"
+ *           example: "Pedido enviado para o fornecedor XYZ"
  *         createdAt:
  *           type: string
  *           format: date-time
@@ -186,14 +200,15 @@ router.get("/saida", (req, res) => {
  *           format: date-time
  *         insumo:
  *           $ref: '#/components/schemas/Insumo'
+ *         usuario:
+ *           $ref: '#/components/schemas/Usuario'
  *
- *     SaidaInput:
+ *     SolicitacaoCompraInput:
  *       type: object
  *       required:
  *         - insumoId
  *         - quantidade
- *         - destino
- *         - motivo
+ *         - justificativa
  *       properties:
  *         insumoId:
  *           type: string
@@ -202,22 +217,17 @@ router.get("/saida", (req, res) => {
  *         quantidade:
  *           type: integer
  *           minimum: 1
- *           example: 5
- *         destino:
+ *           example: 100
+ *         justificativa:
  *           type: string
- *           example: "Setor de Enfermagem"
- *         motivo:
+ *           example: "Estoque abaixo do nível mínimo"
+ *         prioridade:
  *           type: string
- *           example: "Atendimento de emergência"
- *         paciente:
- *           type: string
- *           example: "João da Silva"
+ *           enum: [BAIXA, MEDIA, ALTA, URGENTE]
+ *           example: "MEDIA"
  *         observacoes:
  *           type: string
- *           example: "Saída realizada para procedimento de urgência"
- *         lote:
- *           type: string
- *           example: "LOTE-2024-001"
+ *           example: "Preferência por fornecedor ABC"
  *
  *   securitySchemes:
  *     bearerAuth:

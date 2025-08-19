@@ -1,4 +1,6 @@
 import express from "express";
+import { setupSwagger } from "./lib/swagger";
+
 import insumosRoutes from "./routes/InsumosRoutes";
 import fornecedoresRoutes from "./routes/FornecedoresRoutes";
 import entradasRouter from "./routes/EntradasRoutes";
@@ -8,21 +10,25 @@ import relatoriosRoutes from "./routes/RelatoriosRoutes";
 import usuariosRoutes from "./routes/UsuariosRoutes";
 import authRouter from "./routes/AuthRotes";
 import saidaRouter from "./routes/SaidasRoutes";
+import comprasRoutes from "./routes/ComprasRoutes";
 
 const app = express();
 
+setupSwagger(app);
 app.use(express.json());
 
-app.use("/insumos", insumosRoutes);
-app.use("/fornecedores", fornecedoresRoutes);
+app.use("/api", insumosRoutes);
+app.use("/api", fornecedoresRoutes);
 
-app.use("/entrada", entradasRouter);
-app.use("/saida", saidaRouter);
+app.use("/api", entradasRouter);
+app.use("/api", saidaRouter);
 
-app.use("/estoque", estoqueRoutes);
-app.use("/alertas", alertaRoutes);
-app.use("/relatorios", relatoriosRoutes);
-app.use("/usuarios", usuariosRoutes);
-app.use("/login", authRouter);
+app.use("/api", comprasRoutes);
+
+app.use("/api", estoqueRoutes);
+app.use("/api", alertaRoutes);
+app.use("/api", relatoriosRoutes);
+app.use("/api", usuariosRoutes);
+app.use("/api", authRouter);
 
 export default app;
