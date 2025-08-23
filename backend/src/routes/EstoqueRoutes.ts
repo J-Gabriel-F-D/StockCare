@@ -4,8 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -118,7 +116,7 @@ router.use(autenticar);
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/estoque", (req, res) => {
+router.get("/estoque", autenticar, (req, res) => {
   EstoqueController.getEstoque(req, res);
 });
 

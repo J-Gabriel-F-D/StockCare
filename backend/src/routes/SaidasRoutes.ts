@@ -4,8 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -52,7 +50,7 @@ router.use(autenticar);
  *       500:
  *         description: Erro interno do servidor
  */
-router.post("/saida", (req, res) => {
+router.post("/saida", autenticar, (req, res) => {
   SaidasController.createSaida(req, res);
 });
 
@@ -134,7 +132,7 @@ router.post("/saida", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/saida", (req, res) => {
+router.get("/saida", autenticar, (req, res) => {
   SaidasController.getSaidas(req, res);
 });
 

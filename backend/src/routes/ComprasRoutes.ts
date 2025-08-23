@@ -4,9 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-// Todas as rotas de compras exigem autenticação
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -53,7 +50,7 @@ router.use(autenticar);
  *       500:
  *         description: Erro interno do servidor
  */
-router.post("/compras", ComprasController.solicitarCompra);
+router.post("/compras", autenticar, ComprasController.solicitarCompra);
 
 /**
  * @swagger
@@ -140,7 +137,7 @@ router.post("/compras", ComprasController.solicitarCompra);
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/compras", ComprasController.listarPedidos);
+router.get("/compras", autenticar, ComprasController.listarPedidos);
 
 // Definição dos schemas
 /**

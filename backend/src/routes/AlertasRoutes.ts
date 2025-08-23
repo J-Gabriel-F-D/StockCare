@@ -4,8 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -94,7 +92,11 @@ router.use(autenticar);
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/alertas/validade/:dias", AlertasController.getAlertasValidade);
+router.get(
+  "/alertas/validade/:dias",
+  autenticar,
+  AlertasController.getAlertasValidade
+);
 
 /**
  * @swagger

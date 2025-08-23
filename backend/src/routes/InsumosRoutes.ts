@@ -4,8 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -23,7 +21,7 @@ router.use(autenticar);
  *       200:
  *         description: Retorna a lista de insumos
  */
-router.get("/insumos", (req, res) => {
+router.get("/insumos", autenticar, (req, res) => {
   InsumosController.getInsumos(req, res);
 });
 
@@ -48,7 +46,7 @@ router.get("/insumos", (req, res) => {
  *       201:
  *         description: Insumo criado com sucesso
  */
-router.post("/insumos", (req, res) => {
+router.post("/insumos", autenticar, (req, res) => {
   InsumosController.createInsumo(req, res);
 });
 
@@ -88,7 +86,7 @@ router.post("/insumos", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/insumos/:id", (req, res) => {
+router.get("/insumos/:id", autenticar, (req, res) => {
   InsumosController.getInsumoById(req, res);
 });
 
@@ -128,7 +126,7 @@ router.get("/insumos/:id", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.put("/insumos/:id", (req, res) => {
+router.put("/insumos/:id", autenticar, (req, res) => {
   InsumosController.updateInsumo(req, res);
 });
 
@@ -164,7 +162,7 @@ router.put("/insumos/:id", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.delete("/insumos/:id", (req, res) => {
+router.delete("/insumos/:id", autenticar, (req, res) => {
   InsumosController.deleteInsumo(req, res);
 });
 

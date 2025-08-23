@@ -4,8 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -36,7 +34,7 @@ router.use(autenticar);
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/fornecedores", (req, res) => {
+router.get("/fornecedores", autenticar, (req, res) => {
   FornecedoresController.getFornecedores(req, res);
 });
 
@@ -72,7 +70,7 @@ router.get("/fornecedores", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/fornecedores/:id", (req, res) => {
+router.get("/fornecedores/:id", autenticar, (req, res) => {
   FornecedoresController.getFornecedorByID(req, res);
 });
 
@@ -105,7 +103,7 @@ router.get("/fornecedores/:id", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.post("/fornecedores", (req, res) => {
+router.post("/fornecedores", autenticar, (req, res) => {
   FornecedoresController.criarFornecedor(req, res);
 });
 
@@ -149,7 +147,7 @@ router.post("/fornecedores", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.put("/fornecedores/:id", (req, res) => {
+router.put("/fornecedores/:id", autenticar, (req, res) => {
   FornecedoresController.atualizarFornecedor(req, res);
 });
 
@@ -189,7 +187,7 @@ router.put("/fornecedores/:id", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.delete("/fornecedores/:id", (req, res) => {
+router.delete("/fornecedores/:id", autenticar, (req, res) => {
   FornecedoresController.removerFornecedor(req, res);
 });
 
