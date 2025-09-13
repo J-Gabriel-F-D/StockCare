@@ -29,6 +29,7 @@ model Insumo {
   precoUnitario   Float
   quantidadeMinima Int        @default(0)
   criadoEm        DateTime    @default(now())
+  codigoBarras    String      @unique
 
   fornecedorId    String
   fornecedor      Fornecedor  @relation(fields: [fornecedorId], references: [id])
@@ -59,7 +60,7 @@ model Entrada {
   validade   DateTime?
 
   insumoId   String
-  insumo     Insumo   @relation(fields: [insumoId], references: [id])
+  insumo     Insumo   @relation(fields: [insumoId], references: [id], onDelete: Cascade)
 
   usuarioId  String
   usuario    Usuario  @relation(fields: [usuarioId], references: [id])
@@ -72,7 +73,7 @@ model Saida {
   destino    String
 
   insumoId   String
-  insumo     Insumo   @relation(fields: [insumoId], references: [id])
+  insumo     Insumo   @relation(fields: [insumoId], references: [id], onDelete: Cascade)
 
   usuarioId  String
   usuario    Usuario  @relation(fields: [usuarioId], references: [id])

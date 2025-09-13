@@ -1,6 +1,6 @@
 // src/routes/PrivateRoute.tsx
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 import type { JSX } from "react";
 
 export default function PrivateRoute({ children }: { children: JSX.Element }) {

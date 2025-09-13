@@ -144,6 +144,7 @@
 
 .login-button:hover {
   background-color: rgba(67, 234, 141, 1);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 991px) {
@@ -165,4 +166,19 @@
 .registration-link {
   color: rgba(3, 31, 16, 1);
   text-decoration: none;
+}
+
+/* src/pages/Login.css */
+.error-message {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #fee;
+  color: #c33;
+  width: 25rem;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 16px 0px;
+  border-left: 4px solid #c33;
+  font-size: 14px;
 }

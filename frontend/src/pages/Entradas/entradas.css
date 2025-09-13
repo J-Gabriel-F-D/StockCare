@@ -1,0 +1,197 @@
+.filtro-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 5% 20px;
+  gap: 20px;
+}
+
+.filtro-data {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filtro-data label {
+  font-weight: bold;
+  color: #031f10;
+}
+
+.input-data {
+  padding: 8px 12px;
+  border: 2px solid #21d37f;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.btn-limpar {
+  padding: 8px 16px;
+  background-color: #21d37f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.btn-limpar:hover:not(:disabled) {
+  background-color: #18a864;
+}
+
+.btn-limpar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-registrar {
+  padding: 10px 20px;
+  background-color: #18a864;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: background-color 0.2s;
+}
+
+.btn-registrar:hover {
+  background-color: #21d37f;
+}
+
+.tabela-entradas {
+  margin: 0 5%;
+  height: 90%;
+  overflow-y: auto;
+  align-items: center;
+  border: 1px solid #21d37f;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.tabela-entradas table {
+  width: 100%;
+  align-items: center;
+  border-collapse: collapse;
+}
+
+.tabela-entradas th,
+.tabela-entradas td {
+  padding: 8px 12px;
+  text-align: left;
+  border: 2px solid #21d37f;
+}
+
+.tabela-entradas th {
+  background-color: #16a762;
+  color: white;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}
+
+.tabela-entradas tr:hover {
+  background-color: #c4feda;
+}
+
+.erro-mensagem {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 5%;
+}
+
+.carregando {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.sem-resultados {
+  margin-top: 5%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  color: #ffc506;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 40px;
+  text-align: center;
+}
+
+.table-btn {
+  background-color: #18a864;
+  color: white;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 5% 0;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.table-btn:hover {
+  background-color: #21d37f;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #18a864;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #095a2f;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .filtro-container {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0 2% 15px;
+  }
+
+  .filtro-data {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tabela-entradas {
+    margin: 0 2%;
+  }
+
+  .tabela-entradas th,
+  .tabela-entradas td {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  }
+
+  .table-btn {
+    padding: 4% 0;
+    font-size: 0.9rem;
+  }
+
+  .title-entrada {
+    font-size: 1.5rem;
+  }
+
+  .sem-resultados {
+    font-size: 1.5rem;
+  }
+
+  .btn-registrar {
+    width: 100%;
+  }
+}

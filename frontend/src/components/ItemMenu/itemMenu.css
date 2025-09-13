@@ -1,0 +1,22 @@
+.sidebar-link {
+  background-color: #21d37f;
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  margin-bottom: 4%;
+  border-radius: 0px 4px 4px 0px;
+  transition: border-radius 0.2s, background-color 0.2s;
+}
+
+.sidebar-link:hover {
+  background-color: rgba(67, 234, 141, 1);
+  border-radius: 0px 40px 40px 0px;
+}
+.text-decoration {
+  color: #075832;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.5rem;
+}

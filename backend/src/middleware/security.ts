@@ -16,12 +16,12 @@ export function setupSecurity(app: Express) {
     })
   );
 
-  // Limite de requisições (100 reqs por 15 min por IP)
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: "Too many requests, please try again later.",
-  });
+  // // Limite de requisições (100 reqs por 15 min por IP)
+  // const limiter = rateLimit({
+  //   windowMs: 15 * 60 * 1000,
+  //   max: 1000,
+  //   message: "Too many requests, please try again later.",
+  // });
 
-  app.use(limiter);
+  // app.use(limiter);
 }

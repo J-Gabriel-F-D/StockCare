@@ -1,4 +1,3 @@
-// src/services/usuariosService.ts
 import api from "./api";
 
 export type Usuario = {
@@ -7,7 +6,7 @@ export type Usuario = {
   email: string;
   matricula: number;
   cpf: string;
-  senha?: string; // só usada no cadastro
+  senha?: string;
 };
 
 export const usuariosService = {
