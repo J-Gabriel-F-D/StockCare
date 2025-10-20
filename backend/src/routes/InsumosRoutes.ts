@@ -4,8 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -23,7 +21,7 @@ router.use(autenticar);
  *       200:
  *         description: Retorna a lista de insumos
  */
-router.get("/insumos", (req, res) => {
+router.get("/insumos", autenticar, (req, res) => {
   InsumosController.getInsumos(req, res);
 });
 
@@ -48,7 +46,7 @@ router.get("/insumos", (req, res) => {
  *       201:
  *         description: Insumo criado com sucesso
  */
-router.post("/insumos", (req, res) => {
+router.post("/insumos", autenticar, (req, res) => {
   InsumosController.createInsumo(req, res);
 });
 
@@ -56,18 +54,18 @@ router.post("/insumos", (req, res) => {
  * @swagger
  * /insumos/{id}:
  *   get:
- *     summary: Busca um insumo pelo ID
- *     description: Retorna os detalhes de um insumo específico baseado no seu ID
+ *     summary: Busca um insumo pelo codigoBarras
+ *     description: Retorna os detalhes de um insumo específico baseado no seu código de barras
  *     tags:
  *       - Insumos
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: codigoBarras
  *         required: true
- *         description: ID único do insumo
+ *         description: codigoBarras único do insumo
  *         schema:
  *           type: string
- *           example: "550e8400-e29b-41d4-a716-446655440000"
+ *           example: "7891234567892"
  *     responses:
  *       200:
  *         description: Insumo encontrado com sucesso
@@ -88,8 +86,8 @@ router.post("/insumos", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/insumos/:id", (req, res) => {
-  InsumosController.getInsumoById(req, res);
+router.get("/insumos/codigoBarras/:codigoBarras", autenticar, (req, res) => {
+  InsumosController.getInsumoByCodigoBarras(req, res);
 });
 
 /**
@@ -128,7 +126,7 @@ router.get("/insumos/:id", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.put("/insumos/:id", (req, res) => {
+router.put("/insumos/:id", autenticar, (req, res) => {
   InsumosController.updateInsumo(req, res);
 });
 
@@ -164,10 +162,50 @@ router.put("/insumos/:id", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.delete("/insumos/:id", (req, res) => {
+router.delete("/insumos/:id", autenticar, (req, res) => {
   InsumosController.deleteInsumo(req, res);
 });
 
+/**
+ * @swagger
+ * /insumos/{id}:
+ *   get:
+ *     summary: Busca um insumo pelo ID
+ *     description: Retorna os detalhes de um insumo específico baseado no seu ID
+ *     tags:
+ *       - Insumos
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID único do insumo (UUID)
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *           example: "550e8400-e29b-41d4-a716-446655440000"
+ *     responses:
+ *       200:
+ *         description: Insumo encontrado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Insumo'
+ *       404:
+ *         description: Insumo não encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Insumo não encontrado"
+ *       500:
+ *         description: Erro interno do servidor
+ */
+router.get("/insumos/id/:id", autenticar, (req, res) => {
+  InsumosController.getInsumoById(req, res);
+});
 /**
  * @swagger
  * components:

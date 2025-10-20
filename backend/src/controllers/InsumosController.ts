@@ -17,11 +17,27 @@ const getInsumoById = async (req: Request, res: Response) => {
     const insumo = await prisma.insumo.findUnique({
       where: { id: id },
     });
+
     if (!insumo) {
       return res.status(404).json({ message: "Insumo não encontrado" });
     }
     res.json(insumo);
   } catch (error) {
+    res.status(500).json({ message: "Erro ao buscar insumo por ID", error });
+  }
+};
+const getInsumoByCodigoBarras = async (req: Request, res: Response) => {
+  try {
+    const { codigoBarras } = req.params;
+    const insumo = await prisma.insumo.findUnique({
+      where: { codigoBarras },
+    });
+    if (!insumo) {
+      return res.status(404).json({ message: "Insumo não encontrado" });
+    }
+    res.json(insumo);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Erro ao buscar insumo", error });
   }
 };
@@ -36,6 +52,7 @@ const createInsumo = async (req: Request, res: Response) => {
       precoUnitario: req.body.precoUnitario,
       fornecedorId: req.body.fornecedorId,
       quantidadeMinima: req.body.quantidadeMinima,
+      codigoBarras: req.body.codigoBarras,
     };
 
     const insumoCriado = await prisma.insumo.create({
@@ -102,8 +119,9 @@ const deleteInsumo = async (req: Request, res: Response) => {
 
 export const InsumosController = {
   getInsumos,
-  getInsumoById,
+  getInsumoByCodigoBarras,
   createInsumo,
   updateInsumo,
   deleteInsumo,
+  getInsumoById,
 };

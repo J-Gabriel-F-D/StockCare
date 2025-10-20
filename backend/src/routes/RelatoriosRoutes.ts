@@ -4,8 +4,6 @@ import { autenticar } from "../middleware/AuthMiddleware";
 
 const router = Router();
 
-router.use(autenticar);
-
 /**
  * @swagger
  * tags:
@@ -70,7 +68,7 @@ router.use(autenticar);
  *                     saldoPeriodo:
  *                       type: integer
  */
-router.get("/relatorios/movimentacoes", (req, res) => {
+router.get("/relatorios/movimentacoes", autenticar, (req, res) => {
   RelatoriosController.getRelatorioMovimentacoes(req, res);
 });
 
@@ -117,7 +115,7 @@ router.get("/relatorios/movimentacoes", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/relatorios/movimentacoes/export", (req, res) => {
+router.get("/relatorios/movimentacoes/export", autenticar, (req, res) => {
   RelatoriosController.createRelatorio(req, res);
 });
 
@@ -162,7 +160,7 @@ router.get("/relatorios/movimentacoes/export", (req, res) => {
  *                   type: integer
  *                   description: Total de insumos em situação crítica
  */
-router.get("/relatorios/insumos-criticos", (req, res) => {
+router.get("/relatorios/insumos-criticos", autenticar, (req, res) => {
   RelatoriosController.getInsumosCriticos(req, res);
 });
 
@@ -202,7 +200,7 @@ router.get("/relatorios/insumos-criticos", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/relatorios/insumos-criticos/export", (req, res) => {
+router.get("/relatorios/insumos-criticos/export", autenticar, (req, res) => {
   RelatoriosController.exportInsumosCriticos(req, res);
 });
 
@@ -250,7 +248,7 @@ router.get("/relatorios/insumos-criticos/export", (req, res) => {
  *                       type: number
  *                     format: float
  */
-router.get("/relatorios/inventario", (req, res) => {
+router.get("/relatorios/inventario", autenticar, (req, res) => {
   RelatoriosController.getInventario(req, res);
 });
 
@@ -283,7 +281,7 @@ router.get("/relatorios/inventario", (req, res) => {
  *       500:
  *         description: Erro interno do servidor
  */
-router.get("/relatorios/inventario/export", (req, res) => {
+router.get("/relatorios/inventario/export", autenticar, (req, res) => {
   RelatoriosController.exportInventario(req, res);
 });
 

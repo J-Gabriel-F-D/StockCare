@@ -1,0 +1,14 @@
+.cards-container {
+  /* margin-left: 40px; */
+  /* margin-right: 40px; */
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.dashboard-container {
+  width: 100%;
+  box-sizing: border-box;
+}

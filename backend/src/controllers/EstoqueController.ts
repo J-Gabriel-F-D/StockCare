@@ -22,7 +22,7 @@ const getEstoque = async (req: Request, res: Response) => {
       );
 
       return {
-        id: insumo.id,
+        codigoBarras: insumo.codigoBarras,
         nome: insumo.nome,
         unidadeMedida: insumo.unidadeMedida,
         quantidadeAtual: totalEntradas - totalSaidas,
