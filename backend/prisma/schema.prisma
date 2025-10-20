@@ -1,0 +1,91 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql" 
+  url      = env("DATABASE_URL")
+}
+
+model Fornecedor {
+  id        String     @id @default(uuid())
+  nome      String
+  cnpj      String     @unique
+  telefone  String?
+  email     String?
+  criadoEm  DateTime   @default(now())
+
+  insumos   Insumo[]
+}
+
+model Insumo {
+  id              String       @id @default(uuid())
+  nome            String
+  descricao       String?
+  unidadeMedida   String
+  precoUnitario   Float
+  quantidadeMinima Int        @default(0)
+  criadoEm        DateTime    @default(now())
+  codigoBarras    String      @unique
+
+  fornecedorId    String
+  fornecedor      Fornecedor  @relation(fields: [fornecedorId], references: [id])
+
+  Entrada Entrada[]
+  Saida Saida[]
+
+  PedidoCompra PedidoCompra[]
+}
+
+model Usuario {
+  id         String   @id @default(uuid())
+  nome       String
+  cpf        String   @unique
+  email      String   @unique
+  senha      String
+  matricula  Int
+  criadoEm   DateTime @default(now())
+
+  Entrada Entrada[]
+  Saida Saida[]
+}
+
+model Entrada {
+  id         String   @id @default(uuid())
+  quantidade Int
+  data       DateTime @default(now())
+  validade   DateTime?
+
+  insumoId   String
+  insumo     Insumo   @relation(fields: [insumoId], references: [id], onDelete: Cascade)
+
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model Saida {
+  id         String   @id @default(uuid())
+  quantidade Int
+  data       DateTime @default(now())
+  destino    String
+
+  insumoId   String
+  insumo     Insumo   @relation(fields: [insumoId], references: [id], onDelete: Cascade)
+
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+}
+
+model PedidoCompra {
+  id        String   @id @default(uuid())
+  insumoId  String
+  quantidade Int
+  status    String   @default("PENDENTE") // PENDENTE | ENVIADO | RECEBIDO
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  insumo    Insumo   @relation(fields: [insumoId], references: [id])
+}

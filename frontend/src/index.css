@@ -1,0 +1,45 @@
+/* src/index.css */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* height: 100%; */
+  /* background-color: aqua; */
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  outline: none;
+  /* margin-top: 8px;
+  margin-bottom: 16px; */
+  /* border-radius: 4px;
+  font-size: 16px; */
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #031f10;
+}

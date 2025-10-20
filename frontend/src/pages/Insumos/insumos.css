@@ -1,0 +1,135 @@
+.tabela-insumos {
+  margin: 5% 5%;
+  height: 90%;
+  overflow-y: auto;
+  align-items: center;
+  border: 1px solid #21d37f;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.tabela-insumos table {
+  width: 100%;
+  align-items: center;
+  border-collapse: collapse;
+}
+
+.tabela-insumos th,
+.tabela-insumos td {
+  padding: 8px 12px;
+  text-align: left;
+  border: 2px solid #21d37f;
+}
+
+.tabela-insumos th {
+  background-color: #16a762;
+  color: white;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+}
+
+.tabela-insumos tr:hover {
+  background-color: #c4feda;
+}
+
+.sem-resultados {
+  margin-top: 5%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  color: #ffc506;
+  font-size: 2rem;
+  font-weight: 700;
+  padding: 40px;
+  text-align: center;
+}
+
+.estoque-normal {
+  color: green;
+  font-weight: bold;
+}
+
+.estoque-baixo {
+  color: orange;
+  font-weight: bold;
+}
+
+.estoque-indisponivel {
+  color: red;
+  font-style: italic;
+}
+
+.insumos-btn {
+  background-color: #18a864;
+  color: white;
+  width: 100%;
+  padding: 8px 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.insumos-btn:hover {
+  background-color: #21d37f;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #18a864;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #095a2f;
+}
+
+.erro-mensagem {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 5%;
+}
+
+.carregando {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .tabela-insumos {
+    margin: 0 2%;
+  }
+
+  .tabela-insumos th,
+  .tabela-insumos td {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  }
+
+  .insumos-btn {
+    padding: 6px 0;
+    font-size: 0.9rem;
+  }
+
+  .title-insumo {
+    font-size: 1.5rem;
+  }
+
+  .sem-resultados {
+    font-size: 1.5rem;
+  }
+}

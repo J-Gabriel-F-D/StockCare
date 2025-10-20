@@ -1,0 +1,168 @@
+/* showFornecedor.css */
+.show-fornecedor-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #031f10;
+}
+
+.fornecedor-details {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  border: 2px #21d37f solid;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.detail-row label {
+  font-weight: bold;
+  width: 100px;
+  color: #333;
+}
+
+.detail-row span {
+  flex: 1;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.detail-row input {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.detail-row input:focus {
+  outline: none;
+  border-color: #18a864;
+}
+
+.erro-mensagem {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.sucesso-mensagem {
+  color: #2e7d32;
+  background-color: #edf7ed;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.acoes-botoes {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-editar {
+  padding: 10px 20px;
+  background-color: #ffa000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-salvar {
+  padding: 10px 20px;
+  background-color: #18a864;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancelar {
+  padding: 10px 20px;
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-excluir {
+  padding: 10px 20px;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-voltar {
+  padding: 10px 20px;
+  background-color: #757575;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-editar:hover {
+  background-color: #ff8f00;
+}
+
+.btn-salvar:hover {
+  background-color: #21d37f;
+}
+
+.btn-cancelar:hover {
+  background-color: #e0e0e0;
+}
+
+.btn-excluir:hover {
+  background-color: #c62828;
+}
+
+.btn-voltar:hover {
+  background-color: #616161;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .detail-row label {
+    margin-bottom: 5px;
+    width: 100%;
+  }
+
+  .acoes-botoes {
+    flex-direction: column;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}
